@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: omer.kesmez
-  Date: 8.09.2024
-  Time: 23:57
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="java.io.InputStream" %>
 <%@ page import="java.util.Scanner" %>
@@ -31,20 +24,22 @@
         public String limit;
         public JSONObject where;
         String filter          = "";
+        String set          = "";
+        String name         = "";
 
         public Json(){}
 
         public JSONObject jsonRead(InputStream inputStream){
             Scanner s       = new Scanner(inputStream).useDelimiter("\\A");
             String result   = s.hasNext() ? s.next() : "";
-            Mongo mongo   = new Mongo();
-            mongo.setAndInsert(null,"jsonread","check","Json.jsp",result);
             try{
                 jsonObject      = new JSONObject(result);
                 parseRequestJsonBody(jsonObject);
+                Mongo mongo   = new Mongo();
+                mongo.setAndInsert(null,"jsonRead","watch","Json.jsp",result);
 
             } catch (Exception e) {
-                //Mongo mongo   = new Mongo();
+                Mongo mongo   = new Mongo();
                 mongo.setAndInsert(e,"jsonRead","error","Json.sql",null);
             } finally {
                 return jsonObject;
@@ -58,23 +53,39 @@
                 table = (String) jo.get("table");
                 limit = (String) jo.get("limit");
                 where = (JSONObject) jo.get("where");
+                if(!jo.isNull("set")){
+                    setObject   = (JSONObject) jo.get("set");
+                }
                 Iterator<String> keys  = where.keys();
                 while(keys.hasNext()) {
                     if(i == 0){
-                        filter = filter + " where ";
+                        filter = filter + " WHERE ";
                     } else{
-                        filter = filter + " and ";
+                        filter = filter + " AND ";
                     }
                     String key = keys.next();
                     filter = filter + " " + key + " = '" + (String) where.get(key) + "'";
                     i++;
                 }
 
+                i = 0;
+                if(!jo.isNull("set")){
+                    Iterator<String> setkeys  = setObject.keys();
+                    while(setkeys.hasNext()) {
+                        if(i == 0){
+                            set = " SET ";
+                        } else{
+                            set = " , ";
+                        }
+                        String key = setkeys.next();
+                        set = set + " " + key + " = '" + (String) setObject.get(key) + "'";
+                        i++;
+                    }
+                }
             } catch (Exception e) {
                 Mongo mongo   = new Mongo();
                 mongo.setAndInsert(e,"setSqlQueryFromRequestJsonBody","error","Json.sql",null);
             } finally {}
         }
     }
-    //
 %>

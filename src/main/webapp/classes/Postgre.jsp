@@ -1,13 +1,8 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: omer.kesmez
-  Date: 8.09.2024
-  Time: 22:39
---%>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="org.json.JSONObject" %>
+<%@ page import="org.json.JSONArray" %>
 <%@include file="Mongo.jsp" %>
 <%@include file="Json.jsp" %>
 <%--
@@ -30,12 +25,10 @@
         JSONObject requestBodyParameters;
         public int error = 0;
         String query = "";
+        JSONObject response    = new JSONObject();
+        JSONArray userList     = new JSONArray();
 
         public Postgre(InputStream inputStream){
-            /*Scanner s       = new Scanner(inputStream).useDelimiter("\\A");
-            String result   = s.hasNext() ? s.next() : "";
-            Mongo mongo   = new Mongo();
-            mongo.setAndInsert(null,"Postgre","check","Postgre.jsp",result);*/
             requestBodyParameters = jsonRead(inputStream);
             if(table == null){
                 error = 1;
@@ -46,59 +39,85 @@
 
         public void connect(){
             String url = "jdbc:postgresql://localhost:5432/local?user=postgres&password=123456&ssl=false";
-            try	{
+            try {
                 Class.forName("org.postgresql.Driver").newInstance();
-                //json          = new Json();
-                //JSONObject jo = json.jsonRead(request.getInputStream());
                 conn = java.sql.DriverManager.getConnection(url);
                 stmt = conn.createStatement();
             }
-            catch (java.sql.SQLException sqle)	{
-                //sqle.printStackTrace();
-                Mongo mongo   = new Mongo();
+            catch (java.sql.SQLException sqle) {
+                Mongo mongo = new Mongo();
                 mongo.setAndInsert(sqle,"connect","error","Postgre.sql",null);
             }
-            catch (Exception e)	{
-                //e.printStackTrace();
-                Mongo mongo   = new Mongo();
+            catch (Exception e) {
+                Mongo mongo = new Mongo();
                 mongo.setAndInsert(e,"connect","error","Postgre.sql",null);
             }
         }
 
         public JSONObject select(){
-            Map<String, String> hm = new HashMap<String, String>();
-            JSONObject rowdata     = new JSONObject();
-            JSONObject response    = new JSONObject();
-            try	{
-                query = "SELECT * FROM "+table+filter+" limit "+limit;
-                rs                     = stmt.executeQuery(query);
+
+            try {
+                query = "SELECT * FROM " + table + filter + " limit " + limit;
+                rs = stmt.executeQuery(query);
                 ResultSetMetaData rsmd = rs.getMetaData();
-                int columnCount        = rsmd.getColumnCount();
+                int columnCount = rsmd.getColumnCount();
+
                 while (rs.next()) {
-                    //out.print(rs.getString(1));
-                    for (int i = 1; i <= columnCount; i++ ) {
-                        String name        = rsmd.getColumnName(i);
+                    JSONObject rowdata = new JSONObject();
+                    for (int i = 1; i <= columnCount; i++) {
+                        String name = rsmd.getColumnName(i);
                         String columnValue = rs.getString(name);
-                        rowdata.put(name,columnValue);
+                        rowdata.put(name, columnValue);
                     }
-                    response.put(rs.getString(1),rowdata);
+                    userList.put(rowdata);
                 }
                 rs.close();
                 stmt.close();
-            } catch (java.sql.SQLException sqle)	{
-                Mongo mongo   = new Mongo();
-                mongo.setAndInsert(sqle,"select","error","Postgre.sql",query);
-            } catch (Exception e)	{
-                Mongo mongo   = new Mongo();
-                mongo.setAndInsert(e,"select","error","Postgre.sql",query);
+
+                if (userList.length() > 0) {
+                    response.put("users", userList);
+                    response.put("status", 200);
+                }
+            } catch (java.sql.SQLException sqle) {
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(sqle, "select", "error", "Postgre.sql", query);
+                response.put("status", 500);
+                response.put("message", "SQL error occurred");
+            } catch (Exception e) {
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(e, "select", "error", "Postgre.sql", query);
+                response.put("status", 500);
+                response.put("message", "General error occurred");
             } finally {
-                if(response.length() == 0){
-                    response.put("status",500);
-                    response.put("message","Postgre error. Please log check. file:Postgre.sql method:select");
+                if (response.length() == 0) {
+                    response.put("status", 500);
+                    response.put("message", "No data found");
                 }
                 return response;
-                //return new JSONObject(hm);
             }
         }
+
+        public JSONObject update(){
+            String message = "";
+            try{
+                query = "UPDATE "+ table + set + filter;
+                stmt.executeUpdate(query);
+                stmt.close();
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(null, "update", "watch", "Postgre.jsp", set);
+                message     = "{\"status\":\"200\",\"message\":\"Operation is succesfully.\"}";
+            } catch (java.sql.SQLException sqle) {
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(sqle, "select", "error", "Postgre.sql", query);
+                message     = "{\"status\":\"500\",\"message\":\"Operation is not succesfully.\"}";
+            } catch (Exception e)	{
+                Mongo mongo   = new Mongo();
+                mongo.setAndInsert(e,"update","error","Postgre.sql",query);
+                message     = "{\"status\":\"500\",\"message\":\"Operation is not succesfully.\"}";
+            } finally {
+                return new JSONObject(message);
+            }
+        }
+
     }
 %>
