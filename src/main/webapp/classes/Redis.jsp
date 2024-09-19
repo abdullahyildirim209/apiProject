@@ -34,6 +34,7 @@
             bucket.set(value,2,TimeUnit.MINUTES);
         }
 
+
         public String getString(String key){
             RBucket<String> bucket  = redisson.getBucket(key);
             return bucket.get();
