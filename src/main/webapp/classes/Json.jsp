@@ -23,6 +23,7 @@
         public String table = null;
         public String limit;
         public JSONObject where;
+        public JSONObject setObject;
         String filter          = "";
         String set          = "";
         String name         = "";
