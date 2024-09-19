@@ -1,18 +1,9 @@
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Enumeration" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="java.io.InputStream" %>
 <%@ page import="java.io.*" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: omer.kesmez
-  Date: 29.08.2024
-  Time: 09:20
-  To change this template use File | Settings | File Templates.
---%>
+<%@ page import="java.util.*" %>
+
 <%
     class Request{
         private java.sql.Statement stmt;
@@ -42,6 +33,33 @@
             }
             return hm;
             //return parameter_list;
+        }
+
+        public JSONObject authenticate() {
+            String inputUsername = request.getParameter("username");
+            String inputPassword = request.getParameter("password");
+            //eger json bir veri gonderldiyse json ile de islem yapabilecek hale getir
+            String validUserName = "playstore";
+            String validPassword = "123456";
+
+            if (inputUsername.equals(validUserName) && inputPassword.equals(validPassword)) {
+                return token(200);
+            } else {
+                return token(401);
+            }
+        }
+
+        public JSONObject token(int HttpStatus){
+            JSONObject jsonObject = new JSONObject();
+            if(HttpStatus == 200){
+                String token = UUID.randomUUID().toString();
+                jsonObject.put("status",200);
+                jsonObject.put("access_token",token);
+            } else if (HttpStatus == 401) {
+                jsonObject.put("status",401);
+                jsonObject.put("message","unauthorized access"+request.getParameter("username"));
+            }
+            return jsonObject;
         }
 
         public void setTestreturn(String test) {

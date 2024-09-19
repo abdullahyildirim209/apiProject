@@ -7,6 +7,4 @@
     out.print(postgre.select());
     //out.print(postgre.filter);
   }
-
-
 %>
