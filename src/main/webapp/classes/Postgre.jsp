@@ -71,6 +71,7 @@
                         rowdata.put(name, columnValue);
                     }
                     userList.put(rowdata);
+
                 }
                 rs.close();
                 stmt.close();
