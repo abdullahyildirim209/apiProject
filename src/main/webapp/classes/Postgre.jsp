@@ -55,7 +55,7 @@
             }
         }
 
-        public JSONObject select2(){
+        public JSONObject select(){
 
             try {
                 query = "SELECT * FROM " + table + filter + " limit " + limit;
@@ -98,73 +98,6 @@
                 return response;
             }
         }
-
-        public JSONObject select(){
-            try	{
-                query = "SELECT * FROM "+table+filter+" limit "+limit;
-                rs                     = stmt.executeQuery(query);
-                ResultSetMetaData rsmd = rs.getMetaData();
-                int columnCount        = rsmd.getColumnCount();
-                while (rs.next()) {
-                    rowdata     = new JSONObject();
-                    for (int i = 1; i <= columnCount; i++ ) {
-                        String name        = rsmd.getColumnName(i);
-                        String columnValue = rs.getString(name);
-                        rowdata.put(name,columnValue);
-                    }
-                    response.put(rs.getString(1),rowdata);
-                }
-                rs.close();
-                stmt.close();
-            } catch (java.sql.SQLException sqle)	{
-                Mongo mongo   = new Mongo();
-                mongo.setAndInsert(sqle,"select","error","Postgre.sql",query);
-            } catch (Exception e)	{
-                Mongo mongo   = new Mongo();
-                mongo.setAndInsert(e,"select","error","Postgre.sql",query);
-            } finally {
-                if(response.length() == 0){
-                    response.put("status",500);
-                    response.put("message","Postgre error. Please log check. file:Postgre.sql method:select");
-                }
-                return response;
-            }
-        }
-
-        /*public JSONObject select() {
-            try {
-                query = "SELECT * FROM " + table + filter + " limit " + limit;
-                rs = stmt.executeQuery(query);
-                ResultSetMetaData rsmd = rs.getMetaData();
-                int columnCount = rsmd.getColumnCount();
-                while (rs.next()) {
-                    rowdata.clear();
-                    for (int i = 1; i <= columnCount; i++) {
-                        String name = rsmd.getColumnName(i);
-                        String columnValue = rs.getString(name);
-                        rowdata.put(name, columnValue);
-                    }
-                    Mongo mongo = new Mongo();
-                    mongo.setAndInsert(null, "select", "watch", "Postgre.jsp", rowdata.toString());
-                    response.put(rs.getString(1), rowdata);
-                }
-                rs.close();
-                stmt.close();
-            } catch (java.sql.SQLException sqle) {
-                Mongo mongo = new Mongo();
-                mongo.setAndInsert(sqle, "select", "error", "Postgre.sql", query);
-            } catch (Exception e) {
-                Mongo mongo = new Mongo();
-                mongo.setAndInsert(e, "select", "error", "Postgre.sql", query);
-            } finally {
-                if (response.length() == 0) {
-                    response.put("status", 500);
-                    response.put("message", "Postgre error. Please log check. file:Postgre.sql method:select");
-                }
-                return response;
-            }
-        }*/
-
 
         public JSONObject update(){
             String message = "";
