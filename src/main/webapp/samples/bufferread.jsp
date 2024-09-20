@@ -15,7 +15,7 @@
 
     String line = null;
     while((line = in.readLine()) != null) {
-        r.print("%s<br/>\r\n", line);
+        r.printf("%s<br/>\r\n", line);
     }
     r.print("emrah");
 
