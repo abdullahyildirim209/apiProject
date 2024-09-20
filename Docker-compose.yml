@@ -1,0 +1,62 @@
+version: '3'
+networks:
+  standart:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
+
+services:
+
+  db:
+    container_name: postgres_container
+    image: bitnami/postgresql:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: local
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./configs/postgres-config/pg_hba.conf:/opt/bitnami/postgresql/conf/pg_hba.conf
+      - ./configs/postgres-config/postgresql.conf:/opt/bitnami/postgresql/conf/postgresql.conf
+#      - ./configs/postgres-config/ply-v2.sql:/ply-v2.sql
+      - ./configs/postgres-config/backup/:/backup
+    networks:
+      standart:
+        ipv4_address: 173.17.0.2
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    networks:
+      standart:
+        ipv4_address: 173.17.0.8
+
+  redis:
+    image: 'bitnami/redis:latest'
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=redispassword
+    networks:
+      standart:
+        ipv4_address: 173.17.0.5
+
+  mongodb:
+    container_name: mongodb_container
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: usermongo
+      MONGO_INITDB_ROOT_PASSWORD: um123456
+    ports:
+      - "27017:27017"
+    networks:
+      standart:
+        ipv4_address: 173.17.0.4

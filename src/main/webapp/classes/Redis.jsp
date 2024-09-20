@@ -25,7 +25,7 @@
         private RedissonClient redisson;
         public Redis(){
             Config cnfg = new Config();
-            cnfg.useSingleServer().setAddress("redis://127.0.0.1:6379").setPassword("redispassword");
+            cnfg.useSingleServer().setAddress("redis://" + dotenv.get("REDIS_SERVER") + ":" + dotenv.get("REDIS_PORT")).setPassword(dotenv.get("REDIS_PASSWORD"));
             redisson = Redisson.create(cnfg);
         }
 

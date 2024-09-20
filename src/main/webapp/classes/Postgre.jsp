@@ -39,11 +39,15 @@
         }
 
         public void connect(){
-            String url = "jdbc:postgresql://localhost:5432/local?user=postgres&password=123456&ssl=false";
+            String url = "jdbc:postgresql://" + dotenv.get("POSTGRES_SERVER") + ":" + dotenv.get("POSTGRES_PORT") + "/" + dotenv.get("POSTGRES_DB") + "?user=" + dotenv.get("POSTGRES_USER") + "&password=" + dotenv.get("POSTGRES_PASSWORD") + "&ssl=" + dotenv.get("POSTGRES_SSL");
             try {
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(null,"connect","trace","Postgres.jsp",url);
                 Class.forName("org.postgresql.Driver").newInstance();
                 conn = java.sql.DriverManager.getConnection(url);
                 stmt = conn.createStatement();
+               /* Mongo mongo = new Mongo();
+                mongo.setAndInsert(null,"connect","trace","Postgres.jsp","");*/
             }
             catch (java.sql.SQLException sqle) {
                 Mongo mongo = new Mongo();

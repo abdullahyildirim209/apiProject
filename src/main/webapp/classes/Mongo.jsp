@@ -42,11 +42,17 @@
         private String collectionName = "log";
         private Document insertData;
         private com.mongodb.client.MongoCollection<Document> collection;
+        private com.mongodb.client.MongoClient mongoClient;
 
         public Mongo(){
             try{
-                com.mongodb.client.MongoClient mongoClient  = MongoClients.create("mongodb://usermongo:um123456@127.0.0.1:27017/?authSource=admin&authMechanism=SCRAM-SHA-1");
-                //com.mongodb.client.MongoClient mongoClient  = MongoClients.create("mongodb://127.0.0.1:27017");
+                String mongoauth="0";
+                if(mongoauth.equals("1")){
+                //if(dotenv.get("MONGO_AUTH")){
+                    mongoClient  = MongoClients.create("mongodb://usermongo:um123456@127.0.0.1:27017/?authSource=admin&authMechanism=SCRAM-SHA-1");
+                } else{
+                    mongoClient  = MongoClients.create("mongodb://127.0.0.1:27017");
+                }
                 MongoDatabase database                      = mongoClient.getDatabase(databaseName);
                 collection                                  = database.getCollection(collectionName);
             } catch (Exception e) {
