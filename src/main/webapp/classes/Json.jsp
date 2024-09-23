@@ -24,8 +24,8 @@
         public String limit;
         public JSONObject where;
         public JSONObject setObject;
-        String filter          = "";
-        String set          = "";
+        public String filter          = "";
+        public String set          = "";
         String name         = "";
 
         public Json(){}

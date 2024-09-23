@@ -39,7 +39,7 @@
             String inputUsername = request.getParameter("username");
             String inputPassword = request.getParameter("password");
             //eger json bir veri gonderldiyse json ile de islem yapabilecek hale getir
-            String validUserName = "playstore";
+            String validUserName = "Abdullah";
             String validPassword = "123456";
 
             if (inputUsername.equals(validUserName) && inputPassword.equals(validPassword)) {
