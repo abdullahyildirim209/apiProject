@@ -13,11 +13,13 @@
         JSONObject jsonObject;
         private String type;
         private String table;
+        private String token;
         public String limit;
         public JSONObject where;
         private String testreturn  = "tanimsiz";
 
         public Request(){
+            this.token = UUID.randomUUID().toString();
         }
 
         public Map<String, String> parameters(){
@@ -60,6 +62,10 @@
                 jsonObject.put("message","unauthorized access"+request.getParameter("username"));
             }
             return jsonObject;
+        }
+
+        public String getToken() {
+            return this.token;
         }
 
         public void setTestreturn(String test) {
