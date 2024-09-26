@@ -18,7 +18,6 @@
     //out.print(postgre.select());
     //out.print(postgre.set);
     //out.print(postgre.filter);
-
     JSONObject jo = postgre.select();
 
     if((jo.get("status")).equals(200)){
