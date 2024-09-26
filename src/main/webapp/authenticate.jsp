@@ -9,7 +9,6 @@
 <%@include file="classes/Request.jsp" %>
 <%@include file="classes/Postgre.jsp" %>
 <%--<%@include file="classes/Json.jsp" %>--%>
-<%--
 <%
     response.setContentType("application/json");
     Request rh = new Request();
@@ -21,21 +20,13 @@
     JSONObject jo = postgre.select();
 
     if((jo.get("status")).equals(200)){
-        //out.print(jo);
-        JSONArray usersArray  =(JSONArray) jo.get("users");
-        //out.print(usersArray );
-        for (int i = 0; i < usersArray.length(); i++) {
-            JSONObject user = usersArray.getJSONObject(i);
-
-            int userId = user.getInt("id");
-            //String userName = user.getString("name");
-            //String userSurname = user.getString("surname");
-
-            out.print("ID: " + userId + ",Token: " + token);
-            //out.print("ID: " + userId + ", Name: " + userName + ", Surname: " + userSurname);
-        }
+        JSONArray users = (JSONArray) jo.get("users");
+        JSONObject user = users.getJSONObject(0);
+        //out.print(users.getJSONObject(0));
+        out.print((String) user.get("id"));
     }
-%>--%>
+%>
+<%--
 <%
     response.setContentType("application/json");
 
@@ -63,4 +54,4 @@
     } else {
         out.print("you couldnot update the token: " + updateResponse.getString("message"));
     }
-%>
+%>--%>
