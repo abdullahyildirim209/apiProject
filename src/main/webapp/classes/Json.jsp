@@ -22,6 +22,7 @@
         public String type;
         public String table = null;
         public String limit;
+        public String sql   = "";
         public JSONObject where;
         public JSONObject setObject;
         public String filter          = "";
@@ -50,23 +51,42 @@
         public void parseRequestJsonBody(JSONObject jo){
             int i = 0;
             try{
-                type  = (String) jo.get("type");
-                table = (String) jo.get("table");
-                limit = (String) jo.get("limit");
-                where = (JSONObject) jo.get("where");
+                if(!jo.isNull("sql")){
+                    sql = (String) jo.get("sql");
+                }
+
+                if(!jo.isNull("type")){
+                    type  = (String) jo.get("type");
+                }
+
+                if(!jo.isNull("table")){
+                    table = (String) jo.get("table");
+                }
+
+                if(!jo.isNull("limit")){
+                    limit = (String) jo.get("limit");
+                }
+
+                if(!jo.isNull("where")){
+                    where = (JSONObject) jo.get("where");
+                }
+
                 if(!jo.isNull("set")){
                     setObject   = (JSONObject) jo.get("set");
                 }
-                Iterator<String> keys  = where.keys();
-                while(keys.hasNext()) {
-                    if(i == 0){
-                        filter = filter + " WHERE ";
-                    } else{
-                        filter = filter + " AND ";
+
+                if(!jo.isNull("where")){
+                    Iterator<String> keys  = where.keys();
+                    while(keys.hasNext()) {
+                        if(i == 0){
+                            filter = filter + " WHERE ";
+                        } else{
+                            filter = filter + " AND ";
+                        }
+                        String key = keys.next();
+                        filter = filter + " " + key + " = '" + (String) where.get(key) + "'";
+                        i++;
                     }
-                    String key = keys.next();
-                    filter = filter + " " + key + " = '" + (String) where.get(key) + "'";
-                    i++;
                 }
 
                 i = 0;
