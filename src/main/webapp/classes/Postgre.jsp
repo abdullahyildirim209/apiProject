@@ -32,7 +32,9 @@
         public Postgre(InputStream inputStream){
             requestBodyParameters = jsonRead(inputStream);
             if(table == null){
-                error = 1;
+                if(sql.equals("")){
+                    error = 1;
+                }
             } else{
                 connect();
             }
@@ -123,6 +125,10 @@
             } finally {
                 return new JSONObject(message);
             }
+        }
+
+        public JSONObject rawSql(){
+            return new JSONObject();
         }
 
     }
