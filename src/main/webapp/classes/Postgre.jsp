@@ -31,10 +31,12 @@
 
         public Postgre(InputStream inputStream){
             requestBodyParameters = jsonRead(inputStream);
-            if(table == null){
-                if(sql.equals("")){
+            //if(table == null){
+            if(table == null && sql.equals("")){
+                //if(sql.equals("")){
+                //if(sql == null){
                     error = 1;
-                }
+                //}
             } else{
                 connect();
             }
@@ -62,9 +64,12 @@
         }
 
         public JSONObject select(){
-
             try {
-                query = "SELECT * FROM " + table + filter + " limit " + limit;
+                if(!sql.equals("")){
+                    query = sql;
+                } else{
+                    query = "SELECT * FROM " + table + filter + " limit " + limit;
+                }
                 rs = stmt.executeQuery(query);
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int columnCount = rsmd.getColumnCount();
@@ -128,7 +133,20 @@
         }
 
         public JSONObject rawSql(){
-            return new JSONObject();
+            try {
+                response = select();
+            } catch (Exception e) {
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(e, "rawSql", "error", "Postgre.sql", sql);
+                response.put("status", 500);
+                response.put("message", "General error occurred");
+            } finally {
+                if (response.length() == 0) {
+                    response.put("status", 500);
+                    response.put("message", "No data found");
+                }
+                return response;
+            }
         }
 
     }
