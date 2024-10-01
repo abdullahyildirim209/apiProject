@@ -1,8 +1,7 @@
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="org.json.JSONArray" %>
+<%@ page import="java.util.*" %>
 <%@include file="Mongo.jsp" %>
 <%@include file="Json.jsp" %>
 <%--
@@ -124,6 +123,47 @@
                 message     = "{\"status\":\"500\",\"message\":\"Operation is not succesfully.\"}";
             } finally {
                 return new JSONObject(message);
+            }
+        }
+
+        public JSONObject token() {
+            //String table = requestBodyParameters.optString("table", "");
+            JSONObject setParams = requestBodyParameters.optJSONObject("set");
+            JSONObject whereParams = requestBodyParameters.optJSONObject("where");
+
+            String generatedToken = UUID.randomUUID().toString();
+            setParams.put("token", generatedToken);
+            String whereClause = " WHERE ";
+            for (String key : whereParams.keySet()) {
+                whereClause += key + " = '" + whereParams.getString(key) + "' AND ";
+                //out.print(whereClause);
+                //out.print(whereParams);
+            }
+            whereClause = whereClause.substring(0, whereClause.length() - 5);
+
+            String setClause = " SET ";
+            for (String key : setParams.keySet()) {
+                setClause += key + " = '" + setParams.getString(key) + "', ";
+                //out.print(setClause);
+                //out.print(setParams);
+            }
+            setClause = setClause.substring(0, setClause.length() - 2);
+
+            query = "UPDATE " + table + setClause + whereClause;
+
+            try {
+                int affectedRows = stmt.executeUpdate(query);
+                if (affectedRows > 0) {
+                    response.put("status", 200);
+                    response.put("generatedToken", generatedToken);
+                } else {
+                    response.put("status", 404);
+                }
+            } catch (SQLException sqle) {
+                response.put("status", 500);
+                response.put("message", "SQL error: " + sqle.getMessage());
+            } finally {
+                return response;
             }
         }
 
