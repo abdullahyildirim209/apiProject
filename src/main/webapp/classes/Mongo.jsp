@@ -46,7 +46,7 @@
 
         public Mongo(){
             try{
-                String mongoauth="0";
+                String mongoauth="1";
                 if(mongoauth.equals("1")){
                 //if(dotenv.get("MONGO_AUTH")){
                     mongoClient  = MongoClients.create("mongodb://usermongo:um123456@127.0.0.1:27017/?authSource=admin&authMechanism=SCRAM-SHA-1");
