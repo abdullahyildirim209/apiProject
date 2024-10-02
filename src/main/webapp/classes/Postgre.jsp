@@ -126,7 +126,7 @@
             }
         }
 
-        public JSONObject token() {
+        /*public JSONObject token() {
             //String table = requestBodyParameters.optString("table", "");
             JSONObject setParams = requestBodyParameters.optJSONObject("set");
             JSONObject whereParams = requestBodyParameters.optJSONObject("where");
@@ -165,6 +165,31 @@
             } finally {
                 return response;
             }
+        }*/
+
+        public JSONObject updateToken(String userId, String token) {
+            JSONObject response = new JSONObject();
+            String query = "UPDATE users SET token = ? WHERE id = ?";
+
+            try {
+                PreparedStatement updateTok = conn.prepareStatement(query);
+                updateTok.setString(1, token);
+                updateTok.setInt(2, Integer.parseInt(userId));
+
+                int affectedRows = updateTok.executeUpdate();
+                if (affectedRows > 0) {
+                    response.put("status", 200);
+                    response.put("message", "Token successfully updated");
+                } else {
+                    response.put("status", 404);
+                    response.put("message", "No matching record found to update");
+                }
+            } catch (SQLException sqle) {
+                response.put("status", 500);
+                response.put("message", "SQL error: " + sqle.getMessage());
+            }
+
+            return response;
         }
 
         public JSONObject rawSql(){
