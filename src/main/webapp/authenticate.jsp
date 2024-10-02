@@ -26,7 +26,12 @@
         JSONArray users = (JSONArray) jo.get("users");
         JSONObject user = users.getJSONObject(0);
         //out.print(users.getJSONObject(0));
-        out.print((String) user.get("id"));
+        String userId = (String) user.get("id");
+        JSONObject updateResponse = postgre.updateToken(userId, token);
+        //out.print((String) user.get("id"));
+        if(updateResponse.getInt("status") == 200){
+            out.print("{\"status\": 200, \"message\": \"Token successfully updated for user with ID: " + userId + "\"}");
+        }
     }
 %>
 
