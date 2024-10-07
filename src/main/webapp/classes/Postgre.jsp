@@ -167,14 +167,15 @@
             }
         }*/
 
-        public JSONObject updateToken(String userId, String token) {
+        public JSONObject updateToken(String userId, String token, String ipAddress) {
             JSONObject response = new JSONObject();
-            String query = "UPDATE users SET token = ? WHERE id = ?";
+            String query = "UPDATE users SET token = ?, ip = ? WHERE id = ? AND status = 'active'";
 
             try {
                 PreparedStatement updateTok = conn.prepareStatement(query);
                 updateTok.setString(1, token);
-                updateTok.setInt(2, Integer.parseInt(userId));
+                updateTok.setString(2, ipAddress);
+                updateTok.setInt(3, Integer.parseInt(userId));
 
                 int affectedRows = updateTok.executeUpdate();
                 if (affectedRows > 0) {
@@ -188,12 +189,24 @@
                 response.put("status", 500);
                 response.put("message", "SQL error: " + sqle.getMessage());
             }
-
             return response;
         }
 
         public JSONObject rawSql(){
-            return new JSONObject();
+            try {
+                response = select();
+            } catch (Exception e) {
+                Mongo mongo = new Mongo();
+                mongo.setAndInsert(e, "rawSql", "error", "Postgre.sql", sql);
+                response.put("status", 500);
+                response.put("message", "General error occurred");
+            } finally {
+                if (response.length() == 0) {
+                    response.put("status", 500);
+                    response.put("message", "No data found");
+                }
+                return response;
+            }
         }
 
     }
