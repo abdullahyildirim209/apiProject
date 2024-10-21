@@ -68,7 +68,7 @@
                 if(!sql.equals("")){
                     query = sql;
                 } else{
-                    query = "SELECT * FROM " + table + filter + " limit " + limit;
+                    query = "SELECT * FROM " + table + filter + limit;
                 }
                 rs = stmt.executeQuery(query);
                 ResultSetMetaData rsmd = rs.getMetaData();
@@ -114,8 +114,13 @@
             String message = "";
             try{
                 query = "UPDATE "+ table + set + filter;
-                stmt.executeUpdate(query);
-                stmt.close();
+//                stmt.executeUpdate(query);
+//                stmt.close();
+                PreparedStatement pstmt;
+                pstmt = conn.prepareStatement(query);
+                pstmt.executeUpdate();
+                pstmt.close();
+
                 Mongo mongo = new Mongo();
                 mongo.setAndInsert(null, "update", "watch", "Postgre.jsp", set);
                 message     = "{\"status\":\"200\",\"message\":\"Operation is succesfully.\"}";

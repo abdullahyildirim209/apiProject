@@ -20,14 +20,14 @@
     class Json{
         JSONObject jsonObject;
         public String type;
-        public String table = null;
-        public String limit;
-        public String sql   = "";
+        public String table     = null;
+        public String limit     = "";
+        public String sql       = "";
+        public String filter    = "";
+        public String set       = "";
+        String name             = "";
         public JSONObject where;
         public JSONObject setObject;
-        public String filter          = "";
-        public String set          = "";
-        String name         = "";
 
         public Json(){}
 
@@ -64,7 +64,7 @@
                 }
 
                 if(!jo.isNull("limit")){
-                    limit = (String) jo.get("limit");
+                    limit = " limit " + (String) jo.get("limit");
                 }
 
                 if(!jo.isNull("where")){
@@ -94,10 +94,11 @@
                     Iterator<String> setkeys  = setObject.keys();
                     while(setkeys.hasNext()) {
                         if(i == 0){
-                            set = " SET ";
+                            set = set + " SET ";
                         } else{
-                            set = " , ";
+                            set = set + " , ";
                         }
+
                         String key = setkeys.next();
                         set = set + " " + key + " = '" + (String) setObject.get(key) + "'";
                         i++;

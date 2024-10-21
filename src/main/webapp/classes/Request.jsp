@@ -13,15 +13,17 @@
         JSONObject jsonObject;
         private String type;
         private String table;
+        private String token;
         public String limit;
         public JSONObject where;
         private String testreturn  = "tanimsiz";
 
         public Request(){
+            this.token = UUID.randomUUID().toString();
         }
 
         public Map<String, String> parameters(){
-        //public ArrayList<String> parameters(){
+            //public ArrayList<String> parameters(){
             Enumeration parameterNames       = request.getParameterNames();
             Map<String, String> hm           = new HashMap<String, String>();
             ArrayList<String> parameter_list = new ArrayList<String>(); // Create an ArrayList object
@@ -60,6 +62,10 @@
                 jsonObject.put("message","unauthorized access"+request.getParameter("username"));
             }
             return jsonObject;
+        }
+
+        public String getToken() {
+            return this.token;
         }
 
         public void setTestreturn(String test) {
